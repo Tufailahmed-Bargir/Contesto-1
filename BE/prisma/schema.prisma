@@ -1,0 +1,46 @@
+ 
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Contest {
+  id        String   @id @default(uuid())  // Ensure there's a unique ID
+  name      String
+  platform  String
+  date      DateTime
+  time      String
+  duration  String
+  status    String
+    solution   Solution?
+ 
+  url       String   @unique  // ✅ Make URL unique to use in `upsert()`
+  createdAt DateTime @default(now())
+}
+
+ 
+
+model Solution {
+  id         Int       @id @default(autoincrement())
+  contestId  String    @unique
+  contest    Contest   @relation(fields: [contestId], references: [id])
+  platform   String
+  youtubeUrl String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Bookmark {
+  id        Int       @id @default(autoincrement())
+   
+   
+   contestId String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+ 
+}
