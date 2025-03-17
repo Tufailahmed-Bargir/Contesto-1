@@ -109,6 +109,5 @@ cd src and nodemon index.js
 - User authentication for personalized experiences
 - Contest performance tracking
 - Community discussions for each contest
-
-Feel free to contribute to the project by opening issues and pull requests. 🚀
+ 
 
