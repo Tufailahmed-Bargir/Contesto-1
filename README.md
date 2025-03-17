@@ -16,7 +16,7 @@ Coding Contest Tracker helps competitive programmers stay updated with upcoming 
 
 ## 🔗 Links & Resources
 
-- **Demo Video-1**: [Watch the project demo](https://www.loom.com/share/f6cf34efddc94a0f920d9d5f8c0e8f95?sid=d4d7e90f-9652-4709-b5d4-e3e22963f117
+- **Demo Video-1**: [Watch the project demo](https://www.loom.com/share/f6cf34efddc94a0f920d9d5f8c0e8f95?sid=86942cfe-313a-4d05-ad30-a9031f979671
 - **Repository**: [Checkout the code](https://github.com/Tufailahmed-Bargir/Contesto-1)
 - **Developer**: [Tufail Ahmed](https://github.com/Tufailahmed-Bargir)
 
