@@ -60,7 +60,14 @@ app.get("/api/all", async function (req, res) {
       });
     }
 
-    const allData = await prisma.contest.findMany({})
+    // const allData = await prisma.contest.findMany({})
+    const allData = await prisma.contest.findMany({
+        orderBy: {
+          status:  "desc" 
+        }
+      });
+      
+   
 
     res.json({ contests: allData });
   } catch (error) {
@@ -152,7 +159,7 @@ app.post('/api/filter', async function(req, res) {
     try {
         const contests = await prisma.contest.findMany({
             where: filterConditions,
-            orderBy: { date: 'asc' } // Optional: Sort by date
+            orderBy: { date: 'desc' } // Optional: Sort by date
         });
 
         res.json({

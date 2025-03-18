@@ -63,7 +63,9 @@ export const fetchLeetContests = async () => {
       };
     });
 
-    console.log(formattedContests);
+    // console.log(formattedContests);
+    console.log('leetcode contests fetched');
+    
     return formattedContests;
   } catch (error) {
     console.error("Error fetching LeetCode contests:", error);

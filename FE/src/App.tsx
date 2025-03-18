@@ -10,7 +10,7 @@ import Admin from "./pages/Admin";
 
 import Navbar from "./components/Navbar";
 import {  AnimatePresence } from "framer-motion";
-import ContestCard from "./pages/Test";
+ 
 import { RecoilRoot } from "recoil";
 
 const queryClient = new QueryClient();
@@ -50,7 +50,7 @@ const App = () => (
                   }
                 />
 
-                <Route path="/test" element={<ContestCard />} />
+                 
               </Routes>
             </AnimatePresence>
           </BrowserRouter>

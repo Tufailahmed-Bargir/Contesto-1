@@ -9,8 +9,9 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useRecoilStateLoadable, useRecoilRefresher_UNSTABLE } from "recoil";
-import { Card } from "./Testing";
+import { ContestCard } from "@/components/ui/ContestCard";
 import { Contest } from "@/lib/types";
+import Loader from "@/components/ui/loader";
 
 const platforms = [
   { id: "codeforces", name: "Codeforces", color: "bg-codeforces", icon: "CF" },
@@ -62,15 +63,14 @@ export default function Dashboard() {
   const filterKey = JSON.stringify(filterParams);
   const refresh = useRecoilRefresher_UNSTABLE(filterAtom(filterKey));
   const [item] = useRecoilStateLoadable(filterAtom(filterKey));
+  console.log('data from backed');
+  console.log(item);
+  
+  if(item.state==='loading'){
+    return <Loader />
+  }
 
-  // Add useEffect to refresh when searchQuery changes
-  useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      refresh();
-    }, 300); // Debounce for 300ms to avoid too frequent updates
-
-    return () => clearTimeout(debounceTimer); // Cleanup
-  }, [searchQuery, refresh]);
+ 
 
   const displayedContests =
     item.state === "hasValue" && item.contents.length > 0
@@ -188,8 +188,10 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {displayedContests.length > 0 ? (
           displayedContests.map((contest, index) => (
+           
+            
             <div key={contest.id} className="relative">
-              <Card contest={contest} index={index} />
+              <ContestCard contest={contest} index={index} />
               <motion.button
                 onClick={() => toggleBookmark(contest.id)}
                 className="absolute top-2 right-2 text-gray-400 hover:text-yellow-500 transition-colors"

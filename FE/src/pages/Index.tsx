@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 
-import Dashboard from "./Test";
+import Dashboard from "./DashboardComponent";
 
 export default function DashboardComponent() {
   return (

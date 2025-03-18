@@ -23,16 +23,7 @@ export const bookmarkedState = atom({
   }),
 });
 
-// export const filterAtom = atomFamily({
-//   key:'filterAtom',
-//   default:selectorFamily({
-//     key:"filterAtomSelector",
-//     get:(data:string)=> async()=>{
-//         const response = await axios.get(`http://localhost:3001/api/filter`, data)
-//       return response.data.contests
-//     }
-//   })
-// })
+ 
 
 export const filterAtom = atomFamily({
   key: "filterAtom",

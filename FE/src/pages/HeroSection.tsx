@@ -70,7 +70,7 @@ export const HeroSection = () => {
                 <Link to={"/dashboard"}>Get Started</Link>
               </ButtonCTA>
               <ButtonCTA variant="secondary" size="lg">
-                Documentation
+                 <a target="_blank" href={"https://github.com/Tufailahmed-Bargir/Contesto-1"}> Documentation</a>
               </ButtonCTA>
             </div>
           </div>
