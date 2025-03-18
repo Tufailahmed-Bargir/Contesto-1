@@ -12,6 +12,7 @@ import Navbar from "./components/Navbar";
 import {  AnimatePresence } from "framer-motion";
  
 import { RecoilRoot } from "recoil";
+import Testing from "./pages/Testing";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,17 @@ const App = () => (
                         <Admin />
                       </main>
                     </div>
+                  }
+                />
+
+<Route
+                  path="/test"
+                  element={
+                  
+                     
+                        <Testing />
+                     
+                     
                   }
                 />
 

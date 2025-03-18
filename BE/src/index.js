@@ -151,7 +151,7 @@ app.post('/api/filter', async function(req, res) {
         filterConditions.platform = { in: platforms }; // Matches any platform in the array
     }
 
-    // Filter by status if provided
+    
     if (status) {
         filterConditions.status = status;
     }
@@ -172,6 +172,31 @@ app.post('/api/filter', async function(req, res) {
     }
 });
 
+app.put('/api/contest/:id', async function(req,res){
+   try {
+    const id = (req.params.id)
+    const updatedLink = req.body.link;
+    console.log('id recived is ', id);
+
+    const getContest = await prisma.contest.update({
+        where:{
+            id
+        },
+        data:{
+            solution:updatedLink
+        }
+    })
+    
+    res.json({
+        msg:"id updated success!",
+        getContest
+    })
+   } catch (error) {
+    console.error("Error updating contest:", error);
+    res.status(500).json({ error: "Internal server error" });
+    
+   }
+})
 
 
 // admin route to add the youtube solution

@@ -5,8 +5,8 @@ import { fetchAllContests } from "@/lib/api";
 import { Contest } from "@/lib/types";
 import { useToast } from "@/components/ui/use-toast";
 import { RefreshCw } from "lucide-react";
-import { useRecoilValue } from "recoil";
-import { contestState } from "@/store/atoms/atom";
+import { useRecoilStateLoadable, useRecoilValue } from "recoil";
+import { contestState, filterAtom } from "@/store/atoms/atom";
 
 const Admin = () => {
   const [contests, setContests] = useState<Contest[]>([]);
@@ -14,13 +14,16 @@ const Admin = () => {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const data = useRecoilValue(contestState);
+   
+    
+    
   // Fetch contests for the admin page (only completed ones)
-  const fetchContests = async () => {
+  // const fetchContests = async () => {
     try {
-      setIsLoading(true);
+      // setIsLoading(true);
       setError(null);
 
-      const allContests = await fetchAllContests();
+      // const allContests = await fetchAllContests();
       // Only completed contests are eligible for solutions
       const completedContests = data.filter((c) => c.status === "Finished");
 
@@ -36,11 +39,11 @@ const Admin = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  // };
 
-  useEffect(() => {
-    fetchContests();
-  }, []);
+  // useEffect(() => {
+  //   fetchContests();
+  // }, []);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -64,7 +67,7 @@ const Admin = () => {
         >
           <p>{error}</p>
           <button
-            onClick={fetchContests}
+            // onClick={fetchContests}
             className="mt-2 px-3 py-1 bg-red-200 dark:bg-red-800 rounded-full text-sm"
           >
             Try Again
@@ -74,7 +77,7 @@ const Admin = () => {
 
       <div className="mb-4 flex justify-end">
         <button
-          onClick={fetchContests}
+          // onClick={fetchContests}
           disabled={isLoading}
           className="flex items-center gap-2 px-3 py-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
         >
