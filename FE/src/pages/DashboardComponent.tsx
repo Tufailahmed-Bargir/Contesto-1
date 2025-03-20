@@ -11,7 +11,7 @@ import { useState, useEffect } from "react";
 import { useRecoilStateLoadable, useRecoilRefresher_UNSTABLE } from "recoil";
 import { ContestCard } from "@/components/ui/ContestCard";
 import { Contest } from "@/lib/types";
-import Loader from "@/components/ui/loader";
+import Loader from "@/components/ui/Loader";
 
 const platforms = [
   { id: "codeforces", name: "Codeforces", color: "bg-codeforces", icon: "CF" },
@@ -63,14 +63,12 @@ export default function Dashboard() {
   const filterKey = JSON.stringify(filterParams);
   const refresh = useRecoilRefresher_UNSTABLE(filterAtom(filterKey));
   const [item] = useRecoilStateLoadable(filterAtom(filterKey));
-  console.log('data from backed');
+  console.log("data from backed");
   console.log(item);
-  
-  if(item.state==='loading'){
-    return <Loader />
-  }
 
- 
+  if (item.state === "loading") {
+    return <Loader />;
+  }
 
   const displayedContests =
     item.state === "hasValue" && item.contents.length > 0
@@ -188,8 +186,6 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {displayedContests.length > 0 ? (
           displayedContests.map((contest, index) => (
-           
-            
             <div key={contest.id} className="relative">
               <ContestCard contest={contest} index={index} />
               <motion.button

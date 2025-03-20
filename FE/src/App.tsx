@@ -6,13 +6,13 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import Landing from "./pages/Landing";
 import Index from "./pages/Index";
-import Admin from "./pages/Admin";
+ 
 
 import Navbar from "./components/Navbar";
-import {  AnimatePresence } from "framer-motion";
- 
+import { AnimatePresence } from "framer-motion";
+
 import { RecoilRoot } from "recoil";
-import Testing from "./pages/Testing";
+import AdminComponent from "./pages/AdminComponent";
 
 const queryClient = new QueryClient();
 
@@ -45,24 +45,11 @@ const App = () => (
                     <div className="min-h-screen flex flex-col">
                       <Navbar />
                       <main className="flex-1">
-                        <Admin />
+                        <AdminComponent />
                       </main>
                     </div>
                   }
                 />
-
-<Route
-                  path="/test"
-                  element={
-                  
-                     
-                        <Testing />
-                     
-                     
-                  }
-                />
-
-                 
               </Routes>
             </AnimatePresence>
           </BrowserRouter>

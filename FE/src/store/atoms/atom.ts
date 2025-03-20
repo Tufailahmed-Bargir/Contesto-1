@@ -23,8 +23,6 @@ export const bookmarkedState = atom({
   }),
 });
 
-
-
 export const filterAtom = atomFamily({
   key: "filterAtom",
   default: selectorFamily({
@@ -50,30 +48,29 @@ export const filterAtom = atomFamily({
   }),
 });
 
-
 export const updateLink = atomFamily({
   key: "updateLink",
   default: selectorFamily({
     key: "updateLinkSelector",
-    get: ({link, id}:{link:string, id:string}) => async () => {
-      try {
-        const response = await axios.put(
-          `http://localhost:3001/api/contest${id}`,
-          {link},
-          {
-            headers: {
-              "Content-Type": "application/json", // Ensure JSON is sent
+    get:
+      ({ link, id }: { link: string; id: string }) =>
+      async () => {
+        try {
+          const response = await axios.put(
+            `http://localhost:3001/api/contest${id}`,
+            { link },
+            {
+              headers: {
+                "Content-Type": "application/json", // Ensure JSON is sent
+              },
             },
-          },
-        );
+          );
 
-        console.log(response.data);
-        return response.data;
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    },
+          console.log(response.data);
+          return response.data;
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      },
   }),
 });
-
- 

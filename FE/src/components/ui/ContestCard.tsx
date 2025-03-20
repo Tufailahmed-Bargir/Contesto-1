@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import {
   Bell,
@@ -6,17 +5,20 @@ import {
   Clock,
   ExternalLink,
   Youtube,
-  Trophy
+  Trophy,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 // import { CountdownTimer } from "./";
-import { 
-  Card, 
-  CardHeader, 
-  CardContent, 
-  CardFooter 
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
 } from "@/components/ui/card";
-import { createCalendarEventDescription, generateGoogleCalendarUrl } from "@/lib/calender";
+import {
+  createCalendarEventDescription,
+  generateGoogleCalendarUrl,
+} from "@/lib/calender";
 import { cn } from "@/lib/utils";
 import { CountdownTimer } from "../CountdownTimer";
 
@@ -29,8 +31,8 @@ type ContestProp = {
   time: string;
   relativeTime: string;
   url: string;
-  duration: string,
-  solution?: string;  
+  duration: string;
+  solution?: string;
 };
 
 const formatDate = (dateString: string) => {
@@ -62,7 +64,7 @@ export function ContestCard({
   const statusIcons = {
     Upcoming: <Trophy className="h-3.5 w-3.5 mr-1" />,
     ongoing: <Clock className="h-3.5 w-3.5 mr-1" />,
-    Finished: <Trophy className="h-3.5 w-3.5 mr-1" />
+    Finished: <Trophy className="h-3.5 w-3.5 mr-1" />,
   };
 
   return (
@@ -81,12 +83,12 @@ export function ContestCard({
                 {contest.platform}
               </span>
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <span
                 className={cn(
                   "text-xs px-2.5 py-1 rounded-full font-medium flex items-center",
-                  statusColors[contest.status]
+                  statusColors[contest.status],
                 )}
               >
                 {statusIcons[contest.status]}
@@ -94,36 +96,38 @@ export function ContestCard({
               </span>
             </div>
           </div>
-          
+
           <h2 className="text-lg font-semibold mt-3 text-gray-900 line-clamp-2">
             {contest.name}
           </h2>
         </CardHeader>
-        
+
         <CardContent className="space-y-4 pb-3">
           <div className="rounded-lg bg-gray-50 p-3 border border-gray-100">
             <div className="text-sm text-gray-500 mb-1 font-medium">Starts</div>
             <div className="flex items-center text-gray-700">
-              <Calendar className="h-4 w-4 mr-2 text-blue-500" /> 
-              <span className="font-medium">{formatDate(contest.date)} (IST)</span>
+              <Calendar className="h-4 w-4 mr-2 text-blue-500" />
+              <span className="font-medium">
+                {formatDate(contest.date)} (IST)
+              </span>
             </div>
-            
+
             <div className="mt-3">
               <CountdownTimer targetDate={contest.date} />
             </div>
           </div>
-          
+
           <div className="flex items-center text-gray-700 pl-1">
-            <Clock className="h-4 w-4 mr-2 text-blue-500" /> 
+            <Clock className="h-4 w-4 mr-2 text-blue-500" />
             <div>
               <span className="text-sm text-gray-500 mr-1">Duration:</span>
               <span className="font-medium">{contest.duration}</span>
             </div>
           </div>
-          
+
           {contest.status === "Upcoming" && (
             <Button
-              variant="outline" 
+              variant="outline"
               size="sm"
               className="w-full border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800"
               asChild
@@ -131,14 +135,18 @@ export function ContestCard({
               <a
                 href={generateGoogleCalendarUrl(
                   contest.name,
-                  createCalendarEventDescription(contest.name, contest.platform, contest.solution),
+                  createCalendarEventDescription(
+                    contest.name,
+                    contest.platform,
+                    contest.solution,
+                  ),
                   contest.url,
                   contest.time,
-                  '30' // 30 minutes reminder
+                  "30", // 30 minutes reminder
                 )}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={e => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
                 className="flex items-center justify-center gap-1.5"
               >
                 <Bell className="h-4 w-4" />
@@ -147,7 +155,7 @@ export function ContestCard({
             </Button>
           )}
         </CardContent>
-        
+
         <CardFooter className="flex gap-2 pt-2 border-t">
           <Button
             variant="default"
@@ -165,7 +173,7 @@ export function ContestCard({
               <ExternalLink className="h-3.5 w-3.5 ml-1.5" />
             </a>
           </Button>
-          
+
           {contest.solution && (
             <Button
               variant="outline"

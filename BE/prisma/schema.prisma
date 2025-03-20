@@ -23,6 +23,12 @@ model Contest {
   createdAt DateTime @default(now())
 }
 
+model youtube_Data{
+  id String @default(cuid())
+  title String
+  url String @unique
+  createdAt DateTime @default(now())
+}
  
 
  

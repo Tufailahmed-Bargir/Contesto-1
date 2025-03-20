@@ -1,5 +1,3 @@
- 
-
 import axios from "axios";
 
 export const fetchLeetContests = async () => {
@@ -22,7 +20,7 @@ export const fetchLeetContests = async () => {
           "Content-Type": "application/json",
           Referer: "https://leetcode.com/contest/",
         },
-      }
+      },
     );
 
     const now = new Date();
@@ -64,8 +62,8 @@ export const fetchLeetContests = async () => {
     });
 
     // console.log(formattedContests);
-    console.log('leetcode contests fetched');
-    
+    console.log("leetcode contests fetched");
+
     return formattedContests;
   } catch (error) {
     console.error("Error fetching LeetCode contests:", error);
@@ -85,8 +83,6 @@ const getRelativeTime = (startTime, now) => {
     return "Started";
   }
 };
-
- 
 
 export const fetchLeetContestsPast = async () => {
   try {
@@ -108,7 +104,7 @@ export const fetchLeetContestsPast = async () => {
           "Content-Type": "application/json",
           Referer: "https://leetcode.com/contest/",
         },
-      }
+      },
     );
 
     const now = new Date();
@@ -157,4 +153,4 @@ export const fetchLeetContestsPast = async () => {
   }
 };
 
-fetchLeetContestsPast()
+fetchLeetContestsPast();

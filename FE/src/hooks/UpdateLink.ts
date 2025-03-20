@@ -12,14 +12,16 @@ const useUpdateContest = () => {
     setError(null);
 
     try {
-      const response = await axios.put(`http://localhost:3001/api/contest/${id}`, { link });
+      const response = await axios.put(
+        `http://localhost:3001/api/contest/${id}`,
+        { link },
+      );
 
       if (response.status === 200) {
         setSuccess(true);
       } else {
         throw new Error("Failed to update contest");
       }
-     
     } catch (err) {
       setError(err.response?.data?.error || err.message);
     } finally {

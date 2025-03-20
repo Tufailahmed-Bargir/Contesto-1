@@ -17,7 +17,7 @@ export function HeroScrollDemo() {
         }
       >
         <img
-          src={"/img.png"}
+          src={"/img3.png"}
           alt="hero"
           className="mx-auto rounded-2xl object-cover h-full object-left-top"
           draggable={false}
