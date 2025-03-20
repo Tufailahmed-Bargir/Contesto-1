@@ -4,9 +4,17 @@ A MERN stack application that  displays upcoming coding contests from LeetCode, 
 ![Screenshot 2025-03-17 092009](https://github.com/user-attachments/assets/dbdc29fb-2099-4389-9dd0-1e25333fd215)
 
 
-![image](https://github.com/user-attachments/assets/64feed3a-2c9a-4abd-b4c6-bf82ffc13f91)
+![Screenshot 2025-03-20 100805](https://github.com/user-attachments/assets/6edf96be-4d9c-4863-9b3e-5dc67db87cfd)
 
-![Screenshot 2025-03-17 090306](https://github.com/user-attachments/assets/b9c89067-1938-444c-a098-01c3c4b73e61)
+# DashBoard page
+![Screenshot 2025-03-20 100745](https://github.com/user-attachments/assets/54bd4492-78b6-4004-a8d3-1905bfb82ce5)
+
+# Search, Filter and BookMark functionality
+![image](https://github.com/user-attachments/assets/004a9705-4e3e-412b-b561-60c4b93f73e2)
+
+# Admin Page
+![Screenshot 2025-03-20 101339](https://github.com/user-attachments/assets/8fc2f143-8c9b-4bd9-8c21-690163a33063)
+
 
 
 
@@ -53,7 +61,7 @@ The following APIs are used to fetch contest details:
 | POST   | `/api/bookmark/:id`  | Bookmark a contest by its ID. | `{ "msg": "Contest bookmarked successfully!", "bookmark": { "contestId": "900" } }` |
 | DELETE | `/api/bookmark/:id`  | Remove a bookmarked contest by its ID. | `{ "msg": "Bookmark deleted successfully!" }` |
 | POST   | `/api/filter`        | Filter contests by platform and status. | `{ "msg": "Here are the filtered contests!", "contests": [...] }` |
-| POST   | `/api/admin`         | Admin-only route to add YouTube solutions. | `{ "msg": "Here is the list of all the past contests!" }` |
+| POST   | `/api/admin`         | Admin-only route to add YouTube solutions. | `{ "msg": "Solution Link added Success!" }` |
 
 ## 🚀 Getting Started
 
@@ -99,10 +107,34 @@ pnpm i
 npm i
 ```
 
+Add the Database credentials from neon.tech or use docker and start the postgres instace :
+```ATABASE_URL="postgresql://postgres:<password>@localhost:5432?schema=public"```
+
+migrate the Database
+```bash
+npx prisma migrate dev --name initial-migration
+ 
+```
+
+generate the prisma client
+```bash
+npx prisma generate
+ 
+```
+
+check prisma working correctly open the prisma studio
+```bash
+npx prisma studio
+ 
+```
+
 run the backend server:
 ```bash
-cd src and nodemon index.js
- 
+cd src
+ # and
+node index.js
+#or 
+nodemon index.js
 ```
 
 ## 🔮 Future Enhancements
