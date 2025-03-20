@@ -6,7 +6,7 @@ export const fetchCodeChefContest = async () => {
       "https://competeapi.vercel.app/contests/codechef/",
     );
     const now = new Date();
-    console.log("codechef contests fetched");
+    // console.log("codechef contests fetched");
     return response.data.future_contests.map((contest) => {
       const startTime = new Date(contest.contest_start_date_iso);
       const endTime = new Date(contest.contest_end_date_iso);
@@ -68,9 +68,9 @@ export const fetchCodeChefPastContests = async () => {
       "https://competeapi.vercel.app/contests/codechef/",
     );
     const now = new Date();
-    const past_contests = response.data.past_contests.slice(0, 50);
+  
 
-    return response.data.past_contests.slice(0, 100).map((contest) => {
+    return response.data.past_contests.slice(0, 150).map((contest) => {
       const startTime = new Date(contest.contest_start_date_iso);
       const endTime = new Date(contest.contest_end_date_iso);
 

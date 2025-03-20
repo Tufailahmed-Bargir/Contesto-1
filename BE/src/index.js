@@ -17,13 +17,9 @@ app.use(cors());
 app.use(express.json());
 const PORT = process.env.PORT || 3001;
 
-import { PrismaClient } from "@prisma/client";
-import {
-  GetCodeChefVideos,
-  GetCodeForcesVideos,
-  GetLeetCodeVideos,
-} from "./lib/getSolutions.js";
-const prisma = new PrismaClient();
+
+ 
+import { prisma } from "./lib/prisma.js";
 
 app.get("/api/all", async function (req, res) {
   try {
@@ -174,7 +170,7 @@ app.put("/api/contest/:id", async function (req, res) {
   try {
     const id = req.params.id;
     const updatedLink = req.body.link;
-    console.log("id recived is ", id);
+    // console.log("id recived is ", id);
 
     const getContest = await prisma.contest.update({
       where: {
@@ -202,59 +198,51 @@ app.post("/api/admin", function (req, res) {
   });
 });
 
-app.get("/api/youtube/videos", async (req, res) => {
+ 
+app.get('/api/youtube/videos', async (req, res) => {
   try {
-    const playlistId = "PLcXpkI9A-RZI6FhydNz3JBt_-p_i25Cbr"; // Your playlist ID
-    const apiKey = process.env.YOUTUBE_API_KEY; // API Key from .env file
+      const playlistIds = [
+          process.env.LEET_CODE_ID,
+          process.env.CODE_FORCES_ID,
+          process.env.CODE_CHEF_ID
+      ];
+      const apiKey = process.env.YOUTUBE_API_KEY;
+      let allVideos = [];
 
-    const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=100&fields=items(snippet(title,resourceId/videoId))&key=${apiKey}`;
+      for (const playlistId of playlistIds) {
+          let nextPageToken = null;
 
-    const response = await axios.get(url);
-    const videos = response.data.items.map((video) => ({
-      title: video.snippet.title,
-      url: `https://www.youtube.com/watch?v=${video.snippet.resourceId.videoId}`,
-    }));
+          do {
+              const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=50&fields=items(snippet(title,resourceId/videoId)),nextPageToken&key=${apiKey}${nextPageToken ? `&pageToken=${nextPageToken}` : ''}`;
 
-    // Store in database (avoid duplicates)
-    for (const video of videos) {
-      await prisma.youtube_Data.upsert({
-        where: { url: video.url },
-        update: {}, // No update needed
-        create: { title: video.title, url: video.url },
-      });
-    }
+              const response = await axios.get(url);
+              const videos = response.data.items.map(video => ({
+                  title: video.snippet.title,
+                  url: `https://www.youtube.com/watch?v=${video.snippet.resourceId.videoId}`
+              }));
 
-    const allData = await prisma.youtube_Data.findMany();
-    res.json({ message: "Videos saved successfully!", allData });
+              allVideos = allVideos.concat(videos);
+              nextPageToken = response.data.nextPageToken || null;
+          } while (nextPageToken);
+      }
+
+      // Store unique videos in the database
+      for (const video of allVideos) {
+          await prisma.youtube_Data.upsert({
+              where: { url: video.url },
+              update: {}, // No update needed
+              create: { title: video.title, url: video.url }
+          });
+      }
+
+      // Fetch and return all stored videos
+      const storedVideos = await prisma.youtube_Data.findMany();
+      res.json({ message: "Videos saved successfully!", storedVideos });
   } catch (error) {
-    console.error("Error fetching YouTube data:", error.message);
-    res.status(500).json({ error: "Failed to fetch and store data" });
+      console.error("Error fetching YouTube data:", error.message);
+      res.status(500).json({ error: "Failed to fetch and store data" });
   }
 });
-
-app.get("/api/youtube/videos", async (req, res) => {
-  try {
-    const leetCodeSolutionVideos = await GetLeetCodeVideos();
-    const CodeChefSolutionVideos = await GetCodeChefVideos();
-    const CodeforcesSolutionVideos = await GetCodeForcesVideos();
-
-    const allSolutionVideos = [
-      ...codeforcesContests.map((c) => ({ ...c, platform: "Codeforces" })),
-      ...codeChefContests.map((c) => ({ ...c, platform: "CodeChef" })),
-      ...leetcodeContests.map((c) => ({ ...c, platform: "LeetCode" })),
-      ...codeForcePast.map((c) => ({ ...c, platform: "Codeforces" })),
-      ...codeChefPast.map((c) => ({ ...c, platform: "CodeChef" })),
-      ...codeLeetPast.map((c) => ({ ...c, platform: "LeetCode" })),
-    ];
-
-    const storedVideos = await prisma.youtube_Data.findMany();
-    res.json({ message: "Videos saved successfully!", storedVideos });
-  } catch (error) {
-    console.error("Error fetching YouTube data:", error.message);
-    res.status(500).json({ error: "Failed to fetch and store data" });
-  }
-});
-
 app.post("/api/automatch", async function (req, res) {
   try {
     // Fetch finished contests and YouTube videos
@@ -293,7 +281,7 @@ app.post("/api/automatch", async function (req, res) {
     console.log("Updated contests with matched YouTube videos:", updates);
 
     res.status(200).json({
-      message: "Links fethced and updated successfully!",
+      message: `Total ${updates.length} solution Links fethced and updated successfully! `,
       updatedContests: updates,
     });
   } catch (error) {

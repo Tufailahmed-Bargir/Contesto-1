@@ -32,7 +32,7 @@ export const fetchCodeforcesContests = async () => {
         } else {
           status = "Finished";
         }
-        console.log("codeforces contests fetched");
+        // console.log("codeforces contests fetched");
         // Convert duration from seconds to hours & minutes
         const durationHours = Math.floor(durationSeconds / 3600);
         const remainingMinutes = Math.floor((durationSeconds % 3600) / 60);
@@ -70,7 +70,7 @@ export const fetchCodeforcesPastContests = async () => {
 
     return response.data.result
       .filter((contest) => contest.phase === "FINISHED")
-      .slice(0, 100)
+      .slice(0, 150)
       .map((contest) => {
         const startTime = new Date(contest.startTimeSeconds * 1000);
         const durationSeconds = contest.durationSeconds;
