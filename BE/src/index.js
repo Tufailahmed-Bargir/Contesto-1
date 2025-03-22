@@ -243,11 +243,11 @@ app.get('/api/youtube/videos', async (req, res) => {
       res.status(500).json({ error: "Failed to fetch and store data" });
   }
 });
-app.post("/api/automatch", async function (req, res) {
+app.post('/api/automatch', async (c) => {
   try {
     // Fetch finished contests and YouTube videos
-    const past_contests = await prisma.contest.findMany({
-      where: { status: "Finished" },
+    const pastContests = await prisma.contest.findMany({
+      where: { status: 'Finished' },
       select: { id: true, name: true, solution: true }, // Include ID to update the solution
     });
 
@@ -256,12 +256,12 @@ app.post("/api/automatch", async function (req, res) {
     });
 
     // Initialize Fuse.js for fuzzy matching
-    const fuse = new Fuse(savedVideos, { keys: ["title"], threshold: 0.3 });
+    const fuse = new Fuse(savedVideos, { keys: ['title'], threshold: 0.3 });
 
-    const updates = [];
+    const updates: { id: number; solution: string }[] = [];
 
-    for (const contest of past_contests) {
-      const match = fuse.search(contest.name)[0]; // Get best match
+    for (const contest of pastContests) {
+      const match = fuse.search(contest.name)[0]; // Get the best match
       if (match) {
         updates.push({
           id: contest.id,
@@ -270,7 +270,7 @@ app.post("/api/automatch", async function (req, res) {
       }
     }
 
-    // Perform bulk update using Prisma
+    // Perform bulk updates using Prisma
     for (const update of updates) {
       await prisma.contest.update({
         where: { id: update.id },
@@ -278,23 +278,24 @@ app.post("/api/automatch", async function (req, res) {
       });
     }
 
-    console.log("Updated contests with matched YouTube videos:", updates);
+    console.log('Updated contests with matched YouTube videos:', updates);
 
-    res.status(200).json({
-      message: `Total ${updates.length} solution Links fethced and updated successfully! `,
+    return c.json({
+      message: `Total ${updates.length} solution links fetched and updated successfully!`,
       updatedContests: updates,
     });
   } catch (error) {
-    console.error("Error updating contest solutions:", error);
+    console.error('Error updating contest solutions:', error);
 
-    // ❌ Always return an error response
-    res.status(500).json({
-      message: "Failed to update contests",
-      error: error.message,
-    });
+    return c.json(
+      {
+        message: 'Failed to update contests',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      },
+      500
+    );
   }
 });
-
 app.listen(PORT, () => {
   console.log("server started on", PORT);
 });
