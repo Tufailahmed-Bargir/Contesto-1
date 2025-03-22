@@ -1,12 +1,14 @@
+import { Backend_url } from "@/lib/config";
 import axios from "axios";
 import { atom, atomFamily, selector, selectorFamily } from "recoil";
+
 
 export const contestState = atom({
   key: "contestState",
   default: selector({
     key: "contestSelector",
     get: async () => {
-      const response = await axios.get("http://localhost:3001/api/all");
+      const response = await axios.get(`${Backend_url}/api/all`);
       return response.data.contests;
     },
   }),
@@ -17,7 +19,7 @@ export const bookmarkedState = atom({
   default: selector({
     key: "bookmarkedStateSelector",
     get: async () => {
-      const response = await axios.get("http://localhost:3001/api/bookmarks");
+      const response = await axios.get(`${Backend_url}/api/bookmark`);
       return response.data.bookmarked;
     },
   }),
@@ -30,7 +32,8 @@ export const filterAtom = atomFamily({
     get: (data: string) => async () => {
       try {
         const response = await axios.post(
-          `http://localhost:3001/api/filter`,
+          // http://127.0.0.1:8787 production url
+          `${Backend_url}/api/filter`,
           data,
           {
             headers: {
@@ -57,7 +60,7 @@ export const updateLink = atomFamily({
       async () => {
         try {
           const response = await axios.put(
-            `http://localhost:3001/api/contest${id}`,
+            `${Backend_url}/api/contest${id}`,
             { link },
             {
               headers: {
