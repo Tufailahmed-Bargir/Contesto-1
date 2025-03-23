@@ -245,7 +245,7 @@ const SolutionForm = ({ contests }: SolutionFormProps) => {
       await fetchAutoMatch();
       toast({
         title: "Success!",
-        description: message,
+        description: message ||"Video solutions added success!",
       });
     } catch {
       toast({

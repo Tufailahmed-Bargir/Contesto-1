@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { Backend_url } from "@/lib/config";
 
 const useAutoMatch = () => {
   const [message, setMessage] = useState<string | null>(null);
@@ -10,7 +11,8 @@ const useAutoMatch = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.post("http://localhost:3001/api/automatch");
+      const response = await axios.get(`${Backend_url}/api/matched`);
+       
       setMessage(response.data.message);
     } catch (err) {
       setError(err.response?.data?.message || "An error occurred");
