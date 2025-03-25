@@ -13,6 +13,7 @@ import { AnimatePresence } from "framer-motion";
 
 import { RecoilRoot } from "recoil";
 import AdminComponent from "./pages/AdminComponent";
+import Testing from "./components/TestingCompo";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,17 @@ const App = () => (
                         <Index />
                       </main>
                     </div>
+                  }
+                />
+                 <Route path="/" element={<Landing />} />
+                <Route
+                  path="/test"
+                  element={
+                    
+                      <main className="flex-1">
+                        <Testing />
+                      </main>
+                    
                   }
                 />
 

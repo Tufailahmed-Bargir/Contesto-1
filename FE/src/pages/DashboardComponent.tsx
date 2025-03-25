@@ -1,4 +1,3 @@
-import { filterAtom } from "@/store/atoms/atom";
 import {
   Search,
   SlidersHorizontal,
@@ -7,11 +6,11 @@ import {
   BookmarkCheck,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
-import { useRecoilStateLoadable, useRecoilRefresher_UNSTABLE } from "recoil";
+import { useState } from "react";
 import { ContestCard } from "@/components/ui/ContestCard";
 import { Contest } from "@/lib/types";
 import Loader from "@/components/ui/Loader";
+import useFetchFilter from "@/hooks/all";
 
 const platforms = [
   { id: "codeforces", name: "Codeforces", color: "bg-codeforces", icon: "CF" },
@@ -25,10 +24,6 @@ const filterOptions = [
   { value: "ongoing", label: "Ongoing" },
   { value: "Finished", label: "Finished" },
 ];
-interface ContestsListProps {
-  contests: Contest[];
-  isLoading: boolean;
-}
 
 export default function Dashboard() {
   const [selectedStatus, setSelectedStatus] = useState("all");
@@ -42,7 +37,7 @@ export default function Dashboard() {
     setSelectedPlatforms((prev) =>
       prev.includes(platform)
         ? prev.filter((p) => p !== platform)
-        : [...prev, platform],
+        : [...prev, platform]
     );
   };
 
@@ -50,7 +45,7 @@ export default function Dashboard() {
     setBookmarkedIds((prev) =>
       prev.includes(contestId)
         ? prev.filter((id) => id !== contestId)
-        : [...prev, contestId],
+        : [...prev, contestId]
     );
   };
 
@@ -61,20 +56,19 @@ export default function Dashboard() {
   };
 
   const filterKey = JSON.stringify(filterParams);
-  const refresh = useRecoilRefresher_UNSTABLE(filterAtom(filterKey));
-  const [item] = useRecoilStateLoadable(filterAtom(filterKey));
-  console.log("data from backed");
-  console.log(item);
+  const { filteredContests, loading, errors } = useFetchFilter(filterKey);
 
-  if (item.state === "loading") {
+  if (loading) {
     return <Loader />;
   }
 
   const displayedContests =
-    item.state === "hasValue" && item.contents.length > 0
+    filteredContests && filteredContests.length > 0
       ? showBookmarksOnly
-        ? item.contents.filter((contest) => bookmarkedIds.includes(contest.id))
-        : item.contents
+        ? filteredContests.filter((contest) =>
+            bookmarkedIds.includes(contest.id)
+          )
+        : filteredContests
       : [];
 
   return (
@@ -140,10 +134,7 @@ export default function Dashboard() {
                   {filterOptions.map((option) => (
                     <button
                       key={option.value}
-                      onClick={() => {
-                        setSelectedStatus(option.value);
-                        refresh();
-                      }}
+                      onClick={() => setSelectedStatus(option.value)}
                       className={`px-3 py-1 text-sm rounded-full transition-colors duration-200 ${
                         selectedStatus === option.value
                           ? "bg-primary text-primary-foreground"
@@ -162,10 +153,7 @@ export default function Dashboard() {
                   {platforms.map((platform) => (
                     <button
                       key={platform.id}
-                      onClick={() => {
-                        togglePlatform(platform.name);
-                        refresh();
-                      }}
+                      onClick={() => togglePlatform(platform.name)}
                       className={`flex items-center gap-2 px-3 py-1 text-sm rounded-full border transition-colors duration-200 ${
                         selectedPlatforms.includes(platform.name)
                           ? `text-white ${platform.color}`
@@ -187,6 +175,7 @@ export default function Dashboard() {
         {displayedContests.length > 0 ? (
           displayedContests.map((contest, index) => (
             <div key={contest.id} className="relative">
+              {/* @ts-expect-error some */}
               <ContestCard contest={contest} index={index} />
               <motion.button
                 onClick={() => toggleBookmark(contest.id)}

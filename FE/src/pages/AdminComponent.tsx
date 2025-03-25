@@ -1,18 +1,22 @@
  
 
 import SolutionForm from "@/components/SolutionForm";
-import { contestState } from "@/store/atoms/atom";
+ 
 import { useState, useEffect } from "react";
-import { useRecoilValue } from "recoil";
+ 
 import { motion, AnimatePresence } from "framer-motion";
 import LoadingSpinner from "./Loader";
+import { useFetchAll } from "@/hooks/all";
  
 
 export default function AdminPage() {
-  const data = useRecoilValue(contestState);
-  console.log("data received is ", data);
+ 
 
-  const [contests, setContests] = useState([]);
+  const {contests} = useFetchAll()
+  console.log('data from hook is  ', contests);
+  
+
+  const [contestss, setContests] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -20,14 +24,14 @@ export default function AdminPage() {
 
     // Simulate loading time for better UX
     const timer = setTimeout(() => {
-      const completedContests = data.filter((c) => c.status === "Finished");
+      const completedContests = contests.filter((c) => c.status === "Finished");
       console.log("All finished contests are:", completedContests.length);
       setContests(completedContests);
       setLoading(false);
     }, 800);
 
     return () => clearTimeout(timer);
-  }, [data]);
+  }, [contests]);
 
   return (
     <motion.div
@@ -71,7 +75,7 @@ export default function AdminPage() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <SolutionForm contests={contests} />
+              <SolutionForm contests={contestss} />
             </motion.div>
           )}
         </AnimatePresence>

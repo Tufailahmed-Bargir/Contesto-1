@@ -1,6 +1,4 @@
-import React from "react";
-
-import { motion } from "framer-motion";
+ 
 import { Code, Calendar, Award } from "lucide-react";
 import HeroSection from "./HeroSection";
 import { HeroScrollDemo } from "@/components/LandingPage/HeroScroll";

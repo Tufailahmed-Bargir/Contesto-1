@@ -1,3 +1,4 @@
+'use client'
 import React, { useEffect, useRef } from "react";
 
 import { ArrowRight } from "lucide-react";
@@ -48,7 +49,7 @@ export const HeroSection = () => {
               ref={headingRef}
               className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight"
             >
-              Your Ultimate Coding Contest Tracker!
+               Coding Contest Tracker!
             </h1>
 
             {/* Subheading */}
