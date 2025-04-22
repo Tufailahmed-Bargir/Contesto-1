@@ -64,21 +64,21 @@ export const HeroSection = () => {
 
             {/* CTA Buttons */}
             <div
-              className="flex flex-wrap gap-4 animate-fade-in"
+              className="flex  w-[300px] gap-4 animate-fade-in"
               style={{ animationDelay: "0.5s" }}
             >
-              <ButtonCTA variant="secondary" size="lg">
-                <Link to={"/dashboard"}>Get Started</Link>
-              </ButtonCTA>
-              <ButtonCTA variant="secondary" size="lg">
-                <a
-                  target="_blank"
-                  href={"https://github.com/Tufailahmed-Bargir/Contesto-1"}
-                >
+              <Link to="/login" className="w-full">
+                <ButtonCTA variant="secondary" size="lg" className="w-full">
+                  Get Started
+                </ButtonCTA>
+              </Link>
+              
+              {/* <ButtonCTA variant="secondary" size="lg">
+                
                   {" "}
                   Documentation
-                </a>
-              </ButtonCTA>
+                 
+              </ButtonCTA> */}
             </div>
           </div>
 

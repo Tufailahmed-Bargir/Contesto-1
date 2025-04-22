@@ -61,8 +61,6 @@ export const fetchLeetContests = async () => {
       };
     });
 
-  
-
     return formattedContests;
   } catch (error) {
     console.error("Error fetching LeetCode contests:", error);
@@ -144,12 +142,9 @@ export const fetchLeetContestsPast = async () => {
       };
     });
 
-    
     return formattedContests;
   } catch (error) {
     console.error("Error fetching LeetCode contests:", error);
     return [];
   }
 };
-
- 

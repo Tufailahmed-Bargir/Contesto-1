@@ -16,7 +16,7 @@ const navItems: NavItem[] = [
     icon: Code,
   },
   {
-    path: "/admin",
+    path: "/admin/login",
     label: "Admin",
     icon: Settings,
   },

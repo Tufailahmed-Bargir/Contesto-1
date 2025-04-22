@@ -1,5 +1,7 @@
 import express from "express";
 import axios from "axios";
+import jwt from 'jsonwebtoken'
+const jwt_secrect='contesto'
 import {
   fetchCodeforcesContests,
   fetchCodeforcesPastContests,
@@ -11,15 +13,43 @@ import {
 import { fetchLeetContests, fetchLeetContestsPast } from "./lib/leetCode.js";
 import Fuse from "fuse.js";
 import cors from "cors";
-
+import bcrypt from 'bcrypt'
 const app = express();
 app.use(cors());
 app.use(express.json());
 const PORT = process.env.PORT || 3001;
 
-
- 
 import { prisma } from "./lib/prisma.js";
+
+// JWT verification middleware
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  
+  if (!token) return res.status(401).json({ msg: 'No token provided' });
+  
+  jwt.verify(token, jwt_secrect, (err, user) => {
+    if (err) return res.status(403).json({ msg: 'Invalid or expired token' });
+    req.user = user;
+    next();
+  });
+};
+
+// Token verification endpoint
+app.get('/api/verify', authenticateToken, (req, res) => {
+  res.status(200).json({ 
+    msg: 'Token is valid',
+    user: {
+      id: req.user.id,
+      isAdmin: req.user.isAdmin || false
+    }
+  });
+});
+
+// Apply authentication middleware to protected routes
+const protectRoute = (req, res, next) => {
+  authenticateToken(req, res, next);
+};
 
 app.get("/api/all", async function (req, res) {
   try {
@@ -198,56 +228,55 @@ app.post("/api/admin", function (req, res) {
   });
 });
 
- 
-app.get('/api/youtube/videos', async (req, res) => {
+app.get("/api/youtube/videos", async (req, res) => {
   try {
-      const playlistIds = [
-          process.env.LEET_CODE_ID,
-          process.env.CODE_FORCES_ID,
-          process.env.CODE_CHEF_ID
-      ];
-      const apiKey = process.env.YOUTUBE_API_KEY;
-      let allVideos = [];
+    const playlistIds = [
+      process.env.LEET_CODE_ID,
+      process.env.CODE_FORCES_ID,
+      process.env.CODE_CHEF_ID,
+    ];
+    const apiKey = process.env.YOUTUBE_API_KEY;
+    let allVideos = [];
 
-      for (const playlistId of playlistIds) {
-          let nextPageToken = null;
+    for (const playlistId of playlistIds) {
+      let nextPageToken = null;
 
-          do {
-              const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=50&fields=items(snippet(title,resourceId/videoId)),nextPageToken&key=${apiKey}${nextPageToken ? `&pageToken=${nextPageToken}` : ''}`;
+      do {
+        const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlistId}&maxResults=50&fields=items(snippet(title,resourceId/videoId)),nextPageToken&key=${apiKey}${nextPageToken ? `&pageToken=${nextPageToken}` : ""}`;
 
-              const response = await axios.get(url);
-              const videos = response.data.items.map(video => ({
-                  title: video.snippet.title,
-                  url: `https://www.youtube.com/watch?v=${video.snippet.resourceId.videoId}`
-              }));
+        const response = await axios.get(url);
+        const videos = response.data.items.map((video) => ({
+          title: video.snippet.title,
+          url: `https://www.youtube.com/watch?v=${video.snippet.resourceId.videoId}`,
+        }));
 
-              allVideos = allVideos.concat(videos);
-              nextPageToken = response.data.nextPageToken || null;
-          } while (nextPageToken);
-      }
+        allVideos = allVideos.concat(videos);
+        nextPageToken = response.data.nextPageToken || null;
+      } while (nextPageToken);
+    }
 
-      // Store unique videos in the database
-      for (const video of allVideos) {
-          await prisma.youtube_Data.upsert({
-              where: { url: video.url },
-              update: {}, // No update needed
-              create: { title: video.title, url: video.url }
-          });
-      }
+    // Store unique videos in the database
+    for (const video of allVideos) {
+      await prisma.youtube_Data.upsert({
+        where: { url: video.url },
+        update: {}, // No update needed
+        create: { title: video.title, url: video.url },
+      });
+    }
 
-      // Fetch and return all stored videos
-      const storedVideos = await prisma.youtube_Data.findMany();
-      res.json({ message: "Videos saved successfully!", storedVideos });
+    // Fetch and return all stored videos
+    const storedVideos = await prisma.youtube_Data.findMany();
+    res.json({ message: "Videos saved successfully!", storedVideos });
   } catch (error) {
-      console.error("Error fetching YouTube data:", error.message);
-      res.status(500).json({ error: "Failed to fetch and store data" });
+    console.error("Error fetching YouTube data:", error.message);
+    res.status(500).json({ error: "Failed to fetch and store data" });
   }
 });
-app.post('/api/automatch', async (c) => {
+app.post("/api/automatch", async (c) => {
   try {
     // Fetch finished contests and YouTube videos
     const pastContests = await prisma.contest.findMany({
-      where: { status: 'Finished' },
+      where: { status: "Finished" },
       select: { id: true, name: true, solution: true }, // Include ID to update the solution
     });
 
@@ -256,9 +285,9 @@ app.post('/api/automatch', async (c) => {
     });
 
     // Initialize Fuse.js for fuzzy matching
-    const fuse = new Fuse(savedVideos, { keys: ['title'], threshold: 0.3 });
+    const fuse = new Fuse(savedVideos, { keys: ["title"], threshold: 0.3 });
 
-    const updates: { id: number; solution: string }[] = [];
+    // const updates: { id: number; solution: string }[] = [];
 
     for (const contest of pastContests) {
       const match = fuse.search(contest.name)[0]; // Get the best match
@@ -278,24 +307,251 @@ app.post('/api/automatch', async (c) => {
       });
     }
 
-    console.log('Updated contests with matched YouTube videos:', updates);
+    console.log("Updated contests with matched YouTube videos:", updates);
 
     return c.json({
       message: `Total ${updates.length} solution links fetched and updated successfully!`,
       updatedContests: updates,
     });
   } catch (error) {
-    console.error('Error updating contest solutions:', error);
+    console.error("Error updating contest solutions:", error);
 
     return c.json(
       {
-        message: 'Failed to update contests',
-        error: error instanceof Error ? error.message : 'Unknown error',
+        message: "Failed to update contests",
+        error: error instanceof Error ? error.message : "Unknown error",
       },
-      500
+      500,
     );
   }
 });
 app.listen(PORT, () => {
   console.log("server started on", PORT);
+});
+
+
+// user login 
+app.post('/signup', async function(req, res) {
+  try {
+    const { name, email, password } = req.body;
+    console.log('Signup data received', req.body);
+
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        msg: "Please input all the fields!"
+      });
+    }
+
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (existingUser) {
+      return res.status(409).json({
+        msg: "User with this email already exists!"
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const createUser = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        lastLoginAt: new Date() // Set initial login time
+      }
+    });
+
+    const token = jwt.sign({ id: createUser.id }, jwt_secrect, { expiresIn: '1d' });
+    console.log('Token created successfully!', token);
+
+    return res.status(201).json({
+      msg: "User created successfully!",
+      createUser,
+      token
+    });
+  } catch (e) {
+    console.error('Signup error:', e);
+    return res.status(500).json({
+      msg: "Something went wrong. Please try again later."
+    });
+  }
+});
+
+// User login route
+app.post('/login', async function(req, res) {
+  try {
+    const { email, password, name } = req.body;
+    console.log('Login data received', req.body);
+    
+    if (!email || !password) {
+      return res.status(400).json({
+        msg: "Please provide email and password"
+      });
+    }
+
+    // Find the user
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    // If user doesn't exist, create one (auto signup)
+    if (!user) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newUser = await prisma.user.create({
+        data: {
+          name: name || email.split('@')[0],
+          email,
+          password: hashedPassword,
+          lastLoginAt: new Date(), // Record first login time
+        }
+      });
+
+      const token = jwt.sign({ 
+        id: newUser.id, 
+        email: newUser.email,
+        isAdmin: false
+      }, jwt_secrect, { expiresIn: '7d' });
+
+      return res.status(201).json({
+        msg: "User created and logged in successfully",
+        token
+      });
+    }
+
+    // Check password for existing user
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return res.status(401).json({
+        msg: "Invalid credentials"
+      });
+    }
+
+    // Update last login timestamp
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() }
+    });
+
+    // Generate JWT token
+    const token = jwt.sign({ 
+      id: user.id, 
+      email: user.email,
+      isAdmin: false
+    }, jwt_secrect, { expiresIn: '7d' });
+
+    return res.json({
+      msg: "Login successful",
+      token
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    return res.status(500).json({
+      msg: "Something went wrong. Please try again later."
+    });
+  }
+});
+
+// Admin login route
+app.post('/admin_login', async function(req, res) {
+  try {
+    const { admin_name, password } = req.body;
+    console.log('Admin login data received', req.body);
+    
+    if (!admin_name || !password) {
+      return res.status(400).json({
+        msg: "Please provide admin name and password"
+      });
+    }
+
+    // Find the admin
+    let admin;
+    try {
+      admin = await prisma.admin.findFirst({
+        where: { admin_name }
+      });
+    } catch (dbError) {
+      console.error('Database error finding admin:', dbError);
+      return res.status(500).json({
+        msg: "Database error when finding admin"
+      });
+    }
+
+    // If admin doesn't exist, create one
+    if (!admin) {
+      try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newAdmin = await prisma.admin.create({
+          data: {
+            admin_name,
+            password: hashedPassword,
+            lastLoginAt: new Date() // Record first login time
+          }
+        });
+        
+        console.log('New admin created successfully!');
+        
+        const token = jwt.sign({ 
+          id: newAdmin.id, 
+          admin_name: newAdmin.admin_name,
+          isAdmin: true
+        }, jwt_secrect, { expiresIn: '7d' });
+
+        console.log('Admin token created successfully!', token);
+        
+        return res.status(201).json({
+          msg: "Admin created and logged in successfully",
+          token
+        });
+      } catch (createError) {
+        console.error('Error creating new admin:', createError);
+        return res.status(500).json({
+          msg: "Could not create admin account. Admin name may already be taken.",
+          errorType: createError.name
+        });
+      }
+    }
+
+    // Check password for existing admin
+    try {
+      const passwordMatch = await bcrypt.compare(password, admin.password);
+      if (!passwordMatch) {
+        return res.status(401).json({
+          msg: "Invalid credentials"
+        });
+      }
+
+      // Update last login timestamp
+      await prisma.admin.update({
+        where: { id: admin.id },
+        data: { lastLoginAt: new Date() }
+      });
+
+      // Generate JWT token
+      const token = jwt.sign({ 
+        id: admin.id, 
+        admin_name: admin.admin_name,
+        isAdmin: true
+      }, jwt_secrect, { expiresIn: '7d' });
+
+      return res.json({
+        msg: "Admin login successful",
+        token
+      });
+    } catch (authError) {
+      console.error('Authentication error:', authError);
+      return res.status(500).json({
+        msg: "Authentication error",
+        errorType: authError.name
+      });
+    }
+  } catch (error) {
+    console.error('Admin login error:', error);
+    return res.status(500).json({
+      msg: "Something went wrong. Please try again later.",
+      errorType: error.name || 'UnknownError'
+    });
+  }
 });

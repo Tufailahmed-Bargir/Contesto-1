@@ -68,9 +68,8 @@ export const fetchCodeChefPastContests = async () => {
       "https://competeapi.vercel.app/contests/codechef/",
     );
     const now = new Date();
-  
 
-    return response.data.past_contests.slice(0, 150).map((contest) => {
+    return response.data.past_contests.slice(0, 200).map((contest) => {
       const startTime = new Date(contest.contest_start_date_iso);
       const endTime = new Date(contest.contest_end_date_iso);
 
